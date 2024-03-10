@@ -8,9 +8,12 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.abspath(os.path.join(current_dir, ".."))
 sys.path.append(parent_dir)
 
-from logger import logging
-from exceptions import CustomException
- 
+from src.logger import logging
+from src.exceptions import CustomException
+from src.components.data_transformation import DataTransformation
+from src.components.data_transformation import DataTransformationconfig
+
+
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from dataclasses import dataclass
@@ -51,4 +54,7 @@ class DataIngestion:
             raise CustomException(e,sys)
 if __name__=='__main__':
     obj=DataIngestion()
-    obj.initiate_data_ingestion()        
+    train_data,test_data=obj.initiate_data_ingestion()        
+
+    data_transformation=DataTransformation()
+    data_transformation.iniate_data_transformation()
