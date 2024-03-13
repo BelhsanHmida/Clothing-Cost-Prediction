@@ -1,31 +1,64 @@
 import streamlit as st 
 import pandas as pd 
 import numpy as np
+from src.piplines.predict_pipeline import PredictPipeline
 
-st.title('House Price Prediction')
+import pickle  
+
+st.title('Clothe Cost Prediction')
  
-@st.cache_data
-def load_data(nrows):
-    data = pd.read_csv(r'C:\Users\hp\Desktop\HousepricePred\artifact\raw.csv',nrows=nrows)
-    return data
-# Create a text element and let the reader know the data is loading.
-data_load_state = st.text('Loading data...')
+ 
+ID = st.number_input('ID', value=0)
+
+
+st.write('Brand:')
+selected_brand = st.radio("Select Brand", ['Bey&Bey', 'HA', 'Zen', 'Armani', 'Kontakt'])
+st.write("Selected Brand:", selected_brand)
+
+st.write('Style:')
+selected_Style = st.radio("Select Style", ['mta3 a3res' ,'confy' ,'classy' ,'sport' ,'mta3 kolyoum' ,'posé' ,'formel'])
+st.write("Selected Style:", selected_Style)
+
+st.write("Type:")
+selected_type = st.radio("Select Type", ['kabbout', 'sabbat', 'maryoul', 't-shirt', 'serwel', 'jacket', 'hoodie', 'socks'])
+
+# Display the selected type
+st.write("Selected Type:", selected_type)
+  
+
+Thickness = st.number_input('Enter Thickness', value=0.0)
+Length = st.number_input('Enter Length', value=0) 
+Width = st.number_input('Enter width', value=0)
+Color_code_R = st.number_input('Enter color code Red', value=0)
+Color_code_G = st.number_input('Enter color code Green', value=0)
+Color_code_B = st.number_input('Enter color code Blue', value=0) 
+
+
+def predict():
+    with open(r'C:\Users\hp\Desktop\HousepricePred\artifact\model.pkl', 'rb') as file:
+        model = pickle.load(file)
+    with open(r'C:\Users\hp\Desktop\HousepricePred\artifact\preprocessor.pkl', 'rb') as file:
+        preprocessor = pickle.load(file)
+
+    row=np.array([ID,selected_brand,selected_Style,selected_type,Thickness,Length,Width,Color_code_R,Color_code_G,Color_code_B])
+    
+    X=pd.DataFrame([row],columns=['ID','marka','naw3','9at3a','khochn','toul','3ordh','R','G','B'])
+    X=preprocessor.transform(X)
+    prediction=model.predict(X)
+
+    st.write(f'Price is : ',prediction)
+
+    
+
+st.button('Predict Product Cost ',on_click=predict)
+
+
  
 
-# Load 10 rows of data into the dataframe.
-data = load_data(10)
-# Notify the reader that the data was successfully loaded.
-data_load_state.text("Done!  ")
+
+
+
+
+
  
-
-st.subheader('Raw data')
-st.write(data)
-
-st.subheader('Number of pickups by hour')
-FEATURE_COLUMN='LotArea'
-
-hist_values = np.histogram(data[FEATURE_COLUMN], bins=30, range=(0, data[FEATURE_COLUMN].max()))[0]
-st.bar_chart(hist_values)
-
-Romms = st.slider('rooms', 0, 2, 17)
 

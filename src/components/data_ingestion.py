@@ -12,6 +12,9 @@ from src.logger import logging
 from src.exceptions import CustomException
 from src.components.data_transformation import DataTransformation
 from src.components.data_transformation import DataTransformationconfig
+from src.components.model_trainer import ModelTrainerConfig
+from src.components.model_trainer import ModelTrainer
+
 
 
 import pandas as pd
@@ -31,7 +34,7 @@ class DataIngestion:
     def initiate_data_ingestion(self):
         logging.info("Entered the data ingestion method or component")
         try:
-            df=pd.read_csv(r'C:\Users\hp\Desktop\HousepricePred\HousePricePrediction\Data_set\train.csv')
+            df=pd.read_csv(r'C:\Users\hp\Desktop\HousepricePred\HousePricePrediction\Data_set\data.csv')
             logging.info('Read the dataset as dataframe')
 
             os.makedirs(os.path.dirname(self.ingestion_config.test_data_path),exist_ok=True)
@@ -54,7 +57,10 @@ class DataIngestion:
             raise CustomException(e,sys)
 if __name__=='__main__':
     obj=DataIngestion()
-    train_data,test_data=obj.initiate_data_ingestion()        
+    train_data,test_data,_=obj.initiate_data_ingestion()        
 
     data_transformation=DataTransformation()
-    data_transformation.iniate_data_transformation()
+    train_arr,test_arr,_=data_transformation.iniate_data_transformation(train_data,test_data)
+
+    modelTrainer=ModelTrainer()
+    print(modelTrainer.initiate_model_trainer(train_arr,test_arr))

@@ -11,7 +11,9 @@ from sklearn.preprocessing import OneHotEncoder,StandardScaler
 
 from src.exceptions import CustomException
 from src.logger import logging
-from src.utils  import save_object
+from src.utils  import save_objects
+
+
 @dataclass
 class DataTransformationconfig:
     preprocessor_obj_file_path=os.path.join('artifact',"preprocessor.pkl")
@@ -20,22 +22,26 @@ class DataTransformation:
         self.data_transformation_config=DataTransformationconfig()
     def get_data_transformer_object(self):
         try:
-            numerical_features=[]
+            Target='soum'
+            df=pd.read_csv(r'C:\Users\hp\Desktop\HousepricePred\HousePricePrediction\Data_set\data.csv')
+            cat_features=df.select_dtypes(include=['object', 'category']).columns.tolist()
+
+            numerical_features=[x for x in df.columns.tolist() if x not in cat_features and x != Target]
+            
             high_cat_features=[]
             low_cat_features=[]
-            cat_features=low_cat_features+high_cat_features
 
             num_pipeline=Pipeline(
                 steps=[
                     ('imputer',SimpleImputer(strategy='median')),
-                    ('scaler',StandardScaler())
+                    ('scaler',StandardScaler(with_mean=False))
                 ]
                 )
             cat_pipeline=Pipeline(
                 steps=[
-                    ('imputer',SimpleImputer(strategy='most')),
+                    ('imputer',SimpleImputer(strategy='most_frequent')),
                     ('one_hot_encoder',OneHotEncoder()),
-                    ('scaler',StandardScaler())
+                    ('scaler',StandardScaler(with_mean=False))
                 ]
             )
 
@@ -60,12 +66,12 @@ class DataTransformation:
 
             preprocessing_obj=self.get_data_transformer_object()
 
-            target_column_name=''
-            numerical_features=[]
-            high_cat_features=[]
-            low_cat_features=[]
-            cat_features=low_cat_features+high_cat_features
-
+          
+            target_column_name='soum'
+        
+            cat_features=train_df.select_dtypes(include=['object', 'category']).columns.tolist()
+            numerical_features=[x for x in train_df.columns.tolist() if x not in cat_features and x != target_column_name ]
+            
             input_features_test_df=test_df.drop(columns=[target_column_name],axis=1)
             input_features_train_df=train_df.drop(columns=[target_column_name],axis=1)
             
@@ -75,13 +81,13 @@ class DataTransformation:
             logging.info(f'applying preprocessing object on training dataframe and tesing dataframe.')
 
             input_features_train_arr=preprocessing_obj.fit_transform(input_features_train_df)
-            input_features_test_arr=preprocessing_obj.fit_transform(input_features_test_df)
+            input_features_test_arr=preprocessing_obj.transform(input_features_test_df)
 
             train_arr=np.c_[input_features_train_arr,np.array(target_feature_train_df)]
             test_arr=np.c_[input_features_test_arr,np.array(target_feature_test_df)]
             logging.info(f"Saved preprocessing object. ")
 
-            save_object(
+            save_objects(
                 file_path=self.data_transformation_config.preprocessor_obj_file_path,
                 obj=preprocessing_obj
             )
