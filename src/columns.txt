@@ -1,0 +1,8 @@
+# Okay here we are going to be designing the ui for our prediction what are the columns that we need to be chosing :
+marka	: ['Bey&Bey' 'HA' 'Zen' 'Armani' 'Kontakt']
+naw3	: ['mta3 a3res' 'confy' 'classy' 'sport' 'mta3 kolyoum' 'posé' 'formel']
+9at3a	: ['kabbout' 'sabbat' 'maryoul' 't-shirt' 'serwel' 'jacket' 'hoodie' 'socks']
+khochn	: 0-1.5
+toul	: 0-350
+3ordh   : 0-80
+color   : R G B :0-288	
